@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Team Carousel</title>
+  </head>
+  <body>
+    <div class="owl-carousel owl-theme">
+      <div class="item">
+          <img src="images/ali.jpg">
+          <div class="team-member-info">
+              <h3>Ali Rowley</h3>
+              Business Development Manager
+              <div class="team-member-icons">
+                  <a href="mailto:ali@karma.co.uk" title="Email Ali Rowley"><i class="fa fa-envelope-o" aria-hidden="true"></i> &nbsp; Email</a>
+              </div>
+          </div>
+      </div>
+    </div>
+    <script>
+    $('.owl-carousel').owlCarousel({
+        loop:true,
+        margin:10,
+        nav:true,
+        responsive:{
+            0:{
+                items:1
+            },
+            600:{
+                items:3
+            },
+            1000:{
+                items:5
+            }
+        }
+    })
+    </script>
+  </body>
+</html>

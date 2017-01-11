@@ -3,6 +3,25 @@
 Plugin Name: Wordpress Team Slider
 */
 
+// Load in Owl Carousel
+function external_assets()
+{
+  wp_register_script('jQuery', plugins_url('/public/js/jquery-3.1.1.min.js', __FILE__));
+  wp_register_script('owl-carousel', plugins_url('/public/js/owl.carousel.min.js', __FILE__));
+
+  wp_enqueue_script('jQuery');
+  wp_enqueue_script('owl-carousel');
+
+  wp_register_style('owl-carousel', plugins_url('/public/css/owl.carousel.min.css', __FILE__));
+  wp_register_style('team-slider', plugins_url('/public/css/team-slider.css', __FILE__));
+  wp_register_style('font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+
+  wp_enqueue_style('owl-carousel');
+  wp_enqueue_style('team-slider');
+  wp_enqueue_style('font-awesome');
+}
+add_action('wp_enqueue_scripts', 'external_assets');
+
 // Add team_members post type
 function team_members_setup_post_types()
 {
@@ -161,6 +180,80 @@ function team_members_populate_custom_columns($column, $post_id)
   }
 }
 add_action('manage_team_members_posts_custom_column', 'team_members_populate_custom_columns', 10, 2);
+
+// Add shortcode for carousel
+function team_slider_shortcodes_init()
+{
+  function team_slider_shortcode($atts = [], $content = null)
+  {
+    ob_start();
+    ?>
+    <div class="owl-carousel owl-theme">
+      <?php
+      $query = new WP_Query(['post_type' => 'team_members']);
+      $team_members = $query->posts;
+
+      foreach($team_members as $team_member) {
+        $thumbnail_id = get_post_thumbnail_id($team_member->ID);
+        $thumbnail_img = wp_get_attachment_image_src($thumbnail_id, 'full');
+      ?>
+        <div class="item">
+            <img src="<?= $thumbnail_img[0] ?>">
+            <div class="team-member-info">
+                <h3><?= get_post_meta($team_member->ID, 'team_member_meta_name', true) ?></h3>
+                <?= get_post_meta($team_member->ID, 'team_member_meta_role', true) ?>
+                <div class="team-member-icons">
+                    <a href="mailto:ali@karma.co.uk" title="Email Ali Rowley"><i class="fa fa-envelope-o" aria-hidden="true"></i> &nbsp; Email</a>
+                </div>
+            </div>
+        </div>
+      <?php
+      }
+      ?>
+    </div>
+    <div class="team-nav">
+      <a href="#" class="team-nav-button team-nav-next"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
+      <a href="#" class="team-nav-button team-nav-prev"><i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+    </div>
+    <script>
+    var owl = $('.owl-carousel');
+
+    owl.owlCarousel({
+        loop: true,
+        margin: 0,
+        nav: false,
+        rtl: true,
+        responsive: {
+            0: {
+                items:1
+            },
+            600: {
+                items:3
+            },
+            1000: {
+                items:5
+            }
+        }
+    });
+
+    $('.team-nav-next').click(function(e) {
+      e.preventDefault();
+      owl.trigger('next.owl.carousel');
+    });
+
+    $('.team-nav-prev').click(function(e) {
+      e.preventDefault();
+      owl.trigger('prev.owl.carousel');
+    });
+    </script>
+    <?php
+    $content = ob_get_clean();
+
+    return $content;
+  }
+  add_shortcode('team_slider', 'team_slider_shortcode');
+}
+add_action('init', 'team_slider_shortcodes_init');
 
 // Functions to run on plugin activation
 function team_members_install()
