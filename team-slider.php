@@ -6,10 +6,8 @@ Plugin Name: Wordpress Team Slider
 // Load in Owl Carousel
 function external_assets()
 {
-  wp_register_script('jQuery', plugins_url('/public/js/jquery-3.1.1.min.js', __FILE__));
   wp_register_script('owl-carousel', plugins_url('/public/js/owl.carousel.min.js', __FILE__));
 
-  wp_enqueue_script('jQuery');
   wp_enqueue_script('owl-carousel');
 
   wp_register_style('owl-carousel', plugins_url('/public/css/owl.carousel.min.css', __FILE__));
@@ -190,7 +188,7 @@ function team_slider_shortcodes_init()
     ?>
     <div class="owl-carousel owl-theme">
       <?php
-      $query = new WP_Query(['post_type' => 'team_members']);
+      $query = new WP_Query(['post_type' => 'team_members', 'posts_per_page' => -1]);
       $team_members = $query->posts;
 
       foreach($team_members as $team_member) {
@@ -203,7 +201,7 @@ function team_slider_shortcodes_init()
                 <h3><?= get_post_meta($team_member->ID, 'team_member_meta_name', true) ?></h3>
                 <?= get_post_meta($team_member->ID, 'team_member_meta_role', true) ?>
                 <div class="team-member-icons">
-                    <a href="mailto:ali@karma.co.uk" title="Email Ali Rowley"><i class="fa fa-envelope-o" aria-hidden="true"></i> &nbsp; Email</a>
+                    <a href="mailto:<?= get_post_meta($team_member->ID, 'team_member_meta_email', true) ?>" title="<?= get_post_meta($team_member->ID, 'team_member_meta_name', true) ?>">Email &nbsp; <i class="fa fa-envelope-o" aria-hidden="true"></i></a>
                 </div>
             </div>
         </div>
@@ -216,7 +214,7 @@ function team_slider_shortcodes_init()
       <a href="#" class="team-nav-button team-nav-prev"><i class="fa fa-chevron-right" aria-hidden="true"></i></a>
     </div>
     <script>
-    var owl = $('.owl-carousel');
+    var owl = jQuery('.owl-carousel');
 
     owl.owlCarousel({
         loop: true,
@@ -236,12 +234,12 @@ function team_slider_shortcodes_init()
         }
     });
 
-    $('.team-nav-next').click(function(e) {
+    jQuery('.team-nav-next').click(function(e) {
       e.preventDefault();
       owl.trigger('next.owl.carousel');
     });
 
-    $('.team-nav-prev').click(function(e) {
+    jQuery('.team-nav-prev').click(function(e) {
       e.preventDefault();
       owl.trigger('prev.owl.carousel');
     });
